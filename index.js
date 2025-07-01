@@ -137,9 +137,19 @@ bot.on('message', async (msg) => {
         usd = (amount / rate).toFixed(2);
         state.mmk = amount;
         state.usd = usd;
-        state.step = 'await_proof';
+        state.step = 'select_crypto_payment';
 
-        await bot.sendMessage(chatId, `📸 Please upload your payment proof now.\n\n💰 Amount: ${amount} ${currency}\n💲 Estimated: $${usd} USD\n💳 Method: ${state.method}`);
+        await bot.sendMessage(chatId, `🪙 Choose your crypto payment method for $${usd} USD:`, {
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '🏦 Binance', callback_data: 'crypto_binance' }],
+              [{ text: '₮ USDT TRC20', callback_data: 'crypto_usdt_trc20' }],
+              [{ text: '₮ USDT BEP20', callback_data: 'crypto_usdt_bep20' }],
+              [{ text: '⚡ TRX', callback_data: 'crypto_trx' }],
+              [{ text: 'Back', callback_data: 'back_to_amount_crypto' }]
+            ]
+          }
+        });
       }
     }
   } catch (error) {
@@ -261,6 +271,50 @@ bot.on('callback_query', async (query) => {
           ]
         },
       });
+    } else if (data === 'back_to_amount_crypto') {
+      state.step = 'enter_amount';
+      await bot.editMessageText(`💰 Enter the MMK amount you want to top up:\n\n💱 Exchange Rate: 1 USD = ${USD_RATE} MMK\n\nPlease type the amount in MMK:`, {
+        chat_id: chatId,
+        message_id: msgId,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: 'Back', callback_data: 'back_to_method' }]
+          ]
+        },
+      });
+    } else if (data === 'crypto_binance') {
+      state.paymentType = 'Binance';
+      state.step = 'await_proof';
+      
+      await bot.editMessageText(`🏦 Binance Payment Details\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🏷️ Binance ID: EdenVaultSMM\n📧 Email: payments@edenvault.com\n\n📸 After payment, upload your screenshot as proof:`, {
+        chat_id: chatId,
+        message_id: msgId,
+      });
+    } else if (data === 'crypto_usdt_trc20') {
+      state.paymentType = 'USDT TRC20';
+      state.step = 'await_proof';
+      
+      await bot.editMessageText(`₮ USDT TRC20 Payment Details\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🔗 TRC20 Address:\nTXYZ123ABC456DEF789GHI012JKL345MNO678\n\n⚠️ Only send USDT on TRC20 network!\n\n📸 After payment, upload your screenshot as proof:`, {
+        chat_id: chatId,
+        message_id: msgId,
+      });
+    } else if (data === 'crypto_usdt_bep20') {
+      state.paymentType = 'USDT BEP20';
+      state.step = 'await_proof';
+      
+      await bot.editMessageText(`₮ USDT BEP20 Payment Details\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🔗 BEP20 Address:\n0xABC123DEF456GHI789JKL012MNO345PQR678\n\n⚠️ Only send USDT on BEP20 network!\n\n📸 After payment, upload your screenshot as proof:`, {
+        chat_id: chatId,
+        message_id: msgId,
+      });
+    } else if (data === 'crypto_trx') {
+      state.paymentType = 'TRX';
+      state.step = 'await_proof';
+      
+      const trxAmount = (parseFloat(state.usd) * 15).toFixed(2); // Assuming 1 USD = 15 TRX
+      await bot.editMessageText(`⚡ TRX Payment Details\n\n💰 Amount: ${trxAmount} TRX (≈$${state.usd} USD)\n\n📱 Please send to:\n🔗 TRX Address:\nTRX123ABC456DEF789GHI012JKL345MNO678\n\n📸 After payment, upload your screenshot as proof:`, {
+        chat_id: chatId,
+        message_id: msgId,
+      });
     } else if (data.startsWith('processing_')) {
       const userId = data.split('_')[1];
       const userState = userStates[userId];
@@ -277,7 +331,7 @@ bot.on('callback_query', async (query) => {
         methodDisplay = `${userState.method} (${userState.paymentType})`;
       } else {
         amountDisplay = `💵 MMK: ${userState.mmk}`;
-        methodDisplay = userState.method;
+        methodDisplay = `${userState.method} (${userState.paymentType})`;
       }
       
       await bot.editMessageCaption(`🔄 PROCESSING\n\n👤 Username: ${userState.username}\n${amountDisplay}\n💲USD: $${userState.usd}\n💳 Method: ${methodDisplay}\n🆔 User: ${userId}`, {
@@ -343,7 +397,7 @@ bot.on('photo', async (msg) => {
       methodDisplay = `${state.method} (${state.paymentType})`;
     } else {
       amountDisplay = `💵 MMK: ${state.mmk}`;
-      methodDisplay = state.method;
+      methodDisplay = `${state.method} (${state.paymentType})`;
     }
     
     await bot.sendPhoto(ADMIN_ID, fileId, {
