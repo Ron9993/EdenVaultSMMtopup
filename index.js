@@ -144,7 +144,6 @@ bot.on('message', async (msg) => {
               [{ text: '🏦 Binance', callback_data: 'crypto_binance' }],
               [{ text: '₮ USDT TRC20', callback_data: 'crypto_usdt_trc20' }],
               [{ text: '₮ USDT BEP20', callback_data: 'crypto_usdt_bep20' }],
-              [{ text: '⚡ TRX', callback_data: 'crypto_trx' }],
               [{ text: 'Back', callback_data: 'back_to_amount_crypto' }]
             ]
           }
@@ -302,15 +301,6 @@ bot.on('callback_query', async (query) => {
       state.step = 'await_proof';
 
       await bot.editMessageText(`₮ USDT BEP20 Payment Details\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🔗 BEP20 Address:\n0xABC123DEF456GHI789JKL012MNO345PQR678\n\n⚠️ Only send USDT on BEP20 network!\n\n📸 After payment, upload your screenshot as proof:`, {
-        chat_id: chatId,
-        message_id: msgId,
-      });
-    } else if (data === 'crypto_trx') {
-      state.paymentType = 'TRX';
-      state.step = 'await_proof';
-
-      const trxAmount = (parseFloat(state.usd) * 15).toFixed(2); // Assuming 1 USD = 15 TRX
-      await bot.editMessageText(`⚡ TRX Payment Details\n\n💰 Amount: ${trxAmount} TRX (≈$${state.usd} USD)\n\n📱 Please send to:\n🔗 TRX Address:\nTRX123ABC456DEF789GHI012JKL345MNO678\n\n📸 After payment, upload your screenshot as proof:`, {
         chat_id: chatId,
         message_id: msgId,
       });
