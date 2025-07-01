@@ -66,7 +66,7 @@ bot.on('message', async (msg) => {
       });
     } else if (state.step === 'enter_amount') {
       const amount = parseInt(msg.text);
-      
+
       if (isNaN(amount) || amount <= 0) {
         const currency = state.method === 'THB' ? 'THB' : 'MMK';
         await bot.sendMessage(chatId, `❌ Please enter a valid number (${currency} amount):`);
@@ -74,17 +74,17 @@ bot.on('message', async (msg) => {
       }
 
       let minAmount, currency, rate, usd;
-      
+
       if (state.method === 'THB') {
         minAmount = 50;
         currency = 'THB';
         rate = THB_RATE;
-        
+
         if (amount < minAmount) {
           await bot.sendMessage(chatId, `❌ Minimum amount is ${minAmount} THB. Please enter a higher amount:`);
           return;
         }
-        
+
         usd = (amount / rate).toFixed(2);
         state.thb = amount;
         state.usd = usd;
@@ -103,12 +103,12 @@ bot.on('message', async (msg) => {
         minAmount = 1000;
         currency = 'MMK';
         rate = USD_RATE;
-        
+
         if (amount < minAmount) {
           await bot.sendMessage(chatId, `❌ Minimum amount is ${minAmount} MMK. Please enter a higher amount:`);
           return;
         }
-        
+
         usd = (amount / rate).toFixed(2);
         state.mmk = amount;
         state.usd = usd;
@@ -125,17 +125,16 @@ bot.on('message', async (msg) => {
         });
       } else {
         // Crypto method
-        minAmount = 1000;
-        currency = 'MMK';
-        rate = USD_RATE;
-        
+        minAmount = 1;
+        currency = 'USD';
+        rate = 1;
+
         if (amount < minAmount) {
-          await bot.sendMessage(chatId, `❌ Minimum amount is ${minAmount} MMK. Please enter a higher amount:`);
+          await bot.sendMessage(chatId, `❌ Minimum amount is ${minAmount} USD. Please enter a higher amount:`);
           return;
         }
-        
-        usd = (amount / rate).toFixed(2);
-        state.mmk = amount;
+
+        usd = amount;
         state.usd = usd;
         state.step = 'select_crypto_payment';
 
@@ -195,7 +194,7 @@ bot.on('callback_query', async (query) => {
       state.method = 'Crypto';
       state.step = 'enter_amount';
 
-      await bot.editMessageText(`💰 Enter the MMK amount you want to top up:\n\n💱 Exchange Rate: 1 USD = ${USD_RATE} MMK\n\nPlease type the amount in MMK:`, {
+      await bot.editMessageText(`💰 Enter the USD amount you want to top up:\n\nPlease type the amount in USD:`, {
         chat_id: chatId,
         message_id: msgId,
         reply_markup: {
@@ -231,7 +230,7 @@ bot.on('callback_query', async (query) => {
     } else if (data === 'payment_kpay') {
       state.paymentType = 'KPay';
       state.step = 'await_proof';
-      
+
       await bot.editMessageText(`💳 KPay Payment Details\n\n💰 Amount: ${state.mmk} MMK\n💲 Estimated: $${state.usd} USD\n\n📱 Please send to:\n🏷️ Name: EdenVault SMM\n📞 Phone: 09-123-456-789\n\n📸 After payment, upload your screenshot as proof:`, {
         chat_id: chatId,
         message_id: msgId,
@@ -239,7 +238,7 @@ bot.on('callback_query', async (query) => {
     } else if (data === 'payment_wave') {
       state.paymentType = 'Wave';
       state.step = 'await_proof';
-      
+
       await bot.editMessageText(`🌊 Wave Payment Details\n\n💰 Amount: ${state.mmk} MMK\n💲 Estimated: $${state.usd} USD\n\n📱 Please send to:\n🏷️ Name: EdenVault SMM\n📞 Phone: 09-987-654-321\n\n📸 After payment, upload your screenshot as proof:`, {
         chat_id: chatId,
         message_id: msgId,
@@ -247,7 +246,7 @@ bot.on('callback_query', async (query) => {
     } else if (data === 'thb_promptpay') {
       state.paymentType = 'PromptPay';
       state.step = 'await_proof';
-      
+
       await bot.editMessageText(`💳 PromptPay Payment Details\n\n💰 Amount: ${state.thb} THB\n💲 Estimated: $${state.usd} USD\n\n📱 Please send to:\n🏷️ Name: EdenVault SMM\n📞 PromptPay ID: 0123456789\n🏦 Bank: Kasikorn Bank\n\n📸 After payment, upload your screenshot as proof:`, {
         chat_id: chatId,
         message_id: msgId,
@@ -255,7 +254,7 @@ bot.on('callback_query', async (query) => {
     } else if (data === 'thb_bank') {
       state.paymentType = 'Bank Transfer';
       state.step = 'await_proof';
-      
+
       await bot.editMessageText(`🏦 Bank Transfer Details\n\n💰 Amount: ${state.thb} THB\n💲 Estimated: $${state.usd} USD\n\n📱 Please send to:\n🏷️ Name: EdenVault SMM\n🏦 Bank: Kasikorn Bank\n🔢 Account: 123-4-56789-0\n\n📸 After payment, upload your screenshot as proof:`, {
         chat_id: chatId,
         message_id: msgId,
@@ -273,7 +272,7 @@ bot.on('callback_query', async (query) => {
       });
     } else if (data === 'back_to_amount_crypto') {
       state.step = 'enter_amount';
-      await bot.editMessageText(`💰 Enter the MMK amount you want to top up:\n\n💱 Exchange Rate: 1 USD = ${USD_RATE} MMK\n\nPlease type the amount in MMK:`, {
+      await bot.editMessageText(`💰 Enter the USD amount you want to top up:\n\nPlease type the amount in USD:`, {
         chat_id: chatId,
         message_id: msgId,
         reply_markup: {
@@ -285,7 +284,7 @@ bot.on('callback_query', async (query) => {
     } else if (data === 'crypto_binance') {
       state.paymentType = 'Binance';
       state.step = 'await_proof';
-      
+
       await bot.editMessageText(`🏦 Binance Payment Details\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🏷️ Binance ID: EdenVaultSMM\n📧 Email: payments@edenvault.com\n\n📸 After payment, upload your screenshot as proof:`, {
         chat_id: chatId,
         message_id: msgId,
@@ -293,7 +292,7 @@ bot.on('callback_query', async (query) => {
     } else if (data === 'crypto_usdt_trc20') {
       state.paymentType = 'USDT TRC20';
       state.step = 'await_proof';
-      
+
       await bot.editMessageText(`₮ USDT TRC20 Payment Details\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🔗 TRC20 Address:\nTXYZ123ABC456DEF789GHI012JKL345MNO678\n\n⚠️ Only send USDT on TRC20 network!\n\n📸 After payment, upload your screenshot as proof:`, {
         chat_id: chatId,
         message_id: msgId,
@@ -301,7 +300,7 @@ bot.on('callback_query', async (query) => {
     } else if (data === 'crypto_usdt_bep20') {
       state.paymentType = 'USDT BEP20';
       state.step = 'await_proof';
-      
+
       await bot.editMessageText(`₮ USDT BEP20 Payment Details\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🔗 BEP20 Address:\n0xABC123DEF456GHI789JKL012MNO345PQR678\n\n⚠️ Only send USDT on BEP20 network!\n\n📸 After payment, upload your screenshot as proof:`, {
         chat_id: chatId,
         message_id: msgId,
@@ -309,7 +308,7 @@ bot.on('callback_query', async (query) => {
     } else if (data === 'crypto_trx') {
       state.paymentType = 'TRX';
       state.step = 'await_proof';
-      
+
       const trxAmount = (parseFloat(state.usd) * 15).toFixed(2); // Assuming 1 USD = 15 TRX
       await bot.editMessageText(`⚡ TRX Payment Details\n\n💰 Amount: ${trxAmount} TRX (≈$${state.usd} USD)\n\n📱 Please send to:\n🔗 TRX Address:\nTRX123ABC456DEF789GHI012JKL345MNO678\n\n📸 After payment, upload your screenshot as proof:`, {
         chat_id: chatId,
@@ -318,9 +317,9 @@ bot.on('callback_query', async (query) => {
     } else if (data.startsWith('processing_')) {
       const userId = data.split('_')[1];
       const userState = userStates[userId];
-      
+
       await bot.sendMessage(userId, "🔄 Your top-up is being processed. Please wait...");
-      
+
       // Update admin message with new buttons
       let amountDisplay, methodDisplay;
       if (userState.method === 'THB') {
@@ -330,10 +329,10 @@ bot.on('callback_query', async (query) => {
         amountDisplay = `💵 MMK: ${userState.mmk}`;
         methodDisplay = `${userState.method} (${userState.paymentType})`;
       } else {
-        amountDisplay = `💵 MMK: ${userState.mmk}`;
+        amountDisplay = `💲 USD: $${userState.usd}`;
         methodDisplay = `${userState.method} (${userState.paymentType})`;
       }
-      
+
       await bot.editMessageCaption(`🔄 PROCESSING\n\n👤 Username: ${userState.username}\n${amountDisplay}\n💲USD: $${userState.usd}\n💳 Method: ${methodDisplay}\n🆔 User: ${userId}`, {
         chat_id: query.message.chat.id,
         message_id: query.message.message_id,
@@ -396,10 +395,10 @@ bot.on('photo', async (msg) => {
       amountDisplay = `💵 MMK: ${state.mmk}`;
       methodDisplay = `${state.method} (${state.paymentType})`;
     } else {
-      amountDisplay = `💵 MMK: ${state.mmk}`;
+      amountDisplay = `💲 USD: $${state.usd}`;
       methodDisplay = `${state.method} (${state.paymentType})`;
     }
-    
+
     await bot.sendPhoto(ADMIN_ID, fileId, {
       caption: `📥 New Top-up Request\n\n👤 Username: ${state.username}\n${amountDisplay}\n💲USD: $${state.usd}\n💳 Method: ${methodDisplay}\n🆔 User: ${chatId}`,
       reply_markup: {
