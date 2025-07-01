@@ -62,6 +62,25 @@ bot.on('message', async (msg) => {
           ]
         },
       });
+    } else if (state.step === 'enter_amount') {
+      const mmk = parseInt(msg.text);
+      
+      if (isNaN(mmk) || mmk <= 0) {
+        await bot.sendMessage(chatId, "❌ Please enter a valid number (MMK amount):");
+        return;
+      }
+
+      if (mmk < 1000) {
+        await bot.sendMessage(chatId, "❌ Minimum amount is 1000 MMK. Please enter a higher amount:");
+        return;
+      }
+
+      const usd = (mmk / USD_RATE).toFixed(2);
+      state.mmk = mmk;
+      state.usd = usd;
+      state.step = 'await_proof';
+
+      await bot.sendMessage(chatId, `📸 Please upload your payment proof now.\n\n💰 Amount: ${mmk} MMK\n💲 Estimated: $${usd} USD\n💳 Method: ${state.method}`);
     }
   } catch (error) {
     console.error('Error in message handler:', error.message);
@@ -78,44 +97,29 @@ bot.on('callback_query', async (query) => {
   try {
     if (data === 'method_mmk') {
       state.method = 'MMK';
-      state.step = 'select_amount';
+      state.step = 'enter_amount';
 
-      await bot.editMessageText("💰 Choose MMK amount to top up:", {
+      await bot.editMessageText(`💰 Enter the MMK amount you want to top up:\n\n💱 Exchange Rate: 1 USD = ${USD_RATE} MMK\n\nPlease type the amount in MMK:`, {
         chat_id: chatId,
         message_id: msgId,
         reply_markup: {
           inline_keyboard: [
-            [{ text: '3000', callback_data: 'amount_3000' }, { text: '5000', callback_data: 'amount_5000' }, { text: '10000', callback_data: 'amount_10000' }],
             [{ text: 'Back', callback_data: 'back_to_method' }]
           ]
         },
       });
     } else if (data === 'method_crypto') {
       state.method = 'Crypto';
-      state.step = 'select_amount';
+      state.step = 'enter_amount';
 
-      await bot.editMessageText("💰 Choose Crypto amount (in MMK):", {
+      await bot.editMessageText(`💰 Enter the MMK amount you want to top up:\n\n💱 Exchange Rate: 1 USD = ${USD_RATE} MMK\n\nPlease type the amount in MMK:`, {
         chat_id: chatId,
         message_id: msgId,
         reply_markup: {
           inline_keyboard: [
-            [{ text: '3000', callback_data: 'amount_3000' }, { text: '5000', callback_data: 'amount_5000' }, { text: '10000', callback_data: 'amount_10000' }],
             [{ text: 'Back', callback_data: 'back_to_method' }]
           ]
         },
-      });
-    } else if (data.startsWith('amount_')) {
-      const mmk = parseInt(data.split('_')[1]);
-      if (isNaN(mmk)) return;
-
-      const usd = (mmk / USD_RATE).toFixed(2);
-      state.mmk = mmk;
-      state.usd = usd;
-      state.step = 'await_proof';
-
-      await bot.editMessageText(`📸 Please upload your payment proof now.\n\nAmount: ${mmk} MMK\nEstimated: $${usd} USD`, {
-        chat_id: chatId,
-        message_id: msgId,
       });
     } else if (data === 'back_to_method') {
       state.step = 'select_method';
