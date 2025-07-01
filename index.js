@@ -88,9 +88,17 @@ bot.on('message', async (msg) => {
         usd = (amount / rate).toFixed(2);
         state.thb = amount;
         state.usd = usd;
-        state.step = 'await_proof';
+        state.step = 'select_thb_payment';
 
-        await bot.sendMessage(chatId, `📸 Please upload your payment proof now.\n\n💰 Amount: ${amount} ${currency}\n💲 Estimated: $${usd} USD\n💳 Method: ${state.method}`);
+        await bot.sendMessage(chatId, `💳 Choose your THB payment method for ${amount} THB:`, {
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '💳 PromptPay', callback_data: 'thb_promptpay' }],
+              [{ text: '🏦 Bank Transfer', callback_data: 'thb_bank' }],
+              [{ text: 'Back', callback_data: 'back_to_amount_thb' }]
+            ]
+          }
+        });
       } else if (state.method === 'MMK') {
         minAmount = 1000;
         currency = 'MMK';
@@ -226,6 +234,33 @@ bot.on('callback_query', async (query) => {
         chat_id: chatId,
         message_id: msgId,
       });
+    } else if (data === 'thb_promptpay') {
+      state.paymentType = 'PromptPay';
+      state.step = 'await_proof';
+      
+      await bot.editMessageText(`💳 PromptPay Payment Details\n\n💰 Amount: ${state.thb} THB\n💲 Estimated: $${state.usd} USD\n\n📱 Please send to:\n🏷️ Name: EdenVault SMM\n📞 PromptPay ID: 0123456789\n🏦 Bank: Kasikorn Bank\n\n📸 After payment, upload your screenshot as proof:`, {
+        chat_id: chatId,
+        message_id: msgId,
+      });
+    } else if (data === 'thb_bank') {
+      state.paymentType = 'Bank Transfer';
+      state.step = 'await_proof';
+      
+      await bot.editMessageText(`🏦 Bank Transfer Details\n\n💰 Amount: ${state.thb} THB\n💲 Estimated: $${state.usd} USD\n\n📱 Please send to:\n🏷️ Name: EdenVault SMM\n🏦 Bank: Kasikorn Bank\n🔢 Account: 123-4-56789-0\n\n📸 After payment, upload your screenshot as proof:`, {
+        chat_id: chatId,
+        message_id: msgId,
+      });
+    } else if (data === 'back_to_amount_thb') {
+      state.step = 'enter_amount';
+      await bot.editMessageText(`💰 Enter the THB amount you want to top up:\n\n💱 Exchange Rate: 1 USD = ${THB_RATE} THB\n\nPlease type the amount in THB:`, {
+        chat_id: chatId,
+        message_id: msgId,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: 'Back', callback_data: 'back_to_method' }]
+          ]
+        },
+      });
     } else if (data.startsWith('processing_')) {
       const userId = data.split('_')[1];
       const userState = userStates[userId];
@@ -236,7 +271,7 @@ bot.on('callback_query', async (query) => {
       let amountDisplay, methodDisplay;
       if (userState.method === 'THB') {
         amountDisplay = `🇹🇭 THB: ${userState.thb}`;
-        methodDisplay = userState.method;
+        methodDisplay = `${userState.method} (${userState.paymentType})`;
       } else if (userState.method === 'MMK') {
         amountDisplay = `💵 MMK: ${userState.mmk}`;
         methodDisplay = `${userState.method} (${userState.paymentType})`;
@@ -302,7 +337,7 @@ bot.on('photo', async (msg) => {
     let amountDisplay, methodDisplay;
     if (state.method === 'THB') {
       amountDisplay = `🇹🇭 THB: ${state.thb}`;
-      methodDisplay = state.method;
+      methodDisplay = `${state.method} (${state.paymentType})`;
     } else if (state.method === 'MMK') {
       amountDisplay = `💵 MMK: ${state.mmk}`;
       methodDisplay = `${state.method} (${state.paymentType})`;
