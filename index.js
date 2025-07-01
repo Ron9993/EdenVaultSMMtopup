@@ -87,7 +87,11 @@ bot.on('message', async (msg) => {
         
         usd = (amount / rate).toFixed(2);
         state.thb = amount;
-      } else {
+        state.usd = usd;
+        state.step = 'await_proof';
+
+        await bot.sendMessage(chatId, `📸 Please upload your payment proof now.\n\n💰 Amount: ${amount} ${currency}\n💲 Estimated: $${usd} USD\n💳 Method: ${state.method}`);
+      } else if (state.method === 'MMK') {
         minAmount = 1000;
         currency = 'MMK';
         rate = USD_RATE;
@@ -99,12 +103,36 @@ bot.on('message', async (msg) => {
         
         usd = (amount / rate).toFixed(2);
         state.mmk = amount;
+        state.usd = usd;
+        state.step = 'select_payment_type';
+
+        await bot.sendMessage(chatId, `💳 Choose your payment method for ${amount} MMK:`, {
+          reply_markup: {
+            inline_keyboard: [
+              [{ text: '📱 KPay', callback_data: 'payment_kpay' }],
+              [{ text: '🌊 Wave', callback_data: 'payment_wave' }],
+              [{ text: 'Back', callback_data: 'back_to_amount' }]
+            ]
+          }
+        });
+      } else {
+        // Crypto method
+        minAmount = 1000;
+        currency = 'MMK';
+        rate = USD_RATE;
+        
+        if (amount < minAmount) {
+          await bot.sendMessage(chatId, `❌ Minimum amount is ${minAmount} MMK. Please enter a higher amount:`);
+          return;
+        }
+        
+        usd = (amount / rate).toFixed(2);
+        state.mmk = amount;
+        state.usd = usd;
+        state.step = 'await_proof';
+
+        await bot.sendMessage(chatId, `📸 Please upload your payment proof now.\n\n💰 Amount: ${amount} ${currency}\n💲 Estimated: $${usd} USD\n💳 Method: ${state.method}`);
       }
-
-      state.usd = usd;
-      state.step = 'await_proof';
-
-      await bot.sendMessage(chatId, `📸 Please upload your payment proof now.\n\n💰 Amount: ${amount} ${currency}\n💲 Estimated: $${usd} USD\n💳 Method: ${state.method}`);
     }
   } catch (error) {
     console.error('Error in message handler:', error.message);
@@ -171,6 +199,33 @@ bot.on('callback_query', async (query) => {
           ]
         },
       });
+    } else if (data === 'back_to_amount') {
+      state.step = 'enter_amount';
+      await bot.editMessageText(`💰 Enter the MMK amount you want to top up:\n\n💱 Exchange Rate: 1 USD = ${USD_RATE} MMK\n\nPlease type the amount in MMK:`, {
+        chat_id: chatId,
+        message_id: msgId,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: 'Back', callback_data: 'back_to_method' }]
+          ]
+        },
+      });
+    } else if (data === 'payment_kpay') {
+      state.paymentType = 'KPay';
+      state.step = 'await_proof';
+      
+      await bot.editMessageText(`💳 KPay Payment Details\n\n💰 Amount: ${state.mmk} MMK\n💲 Estimated: $${state.usd} USD\n\n📱 Please send to:\n🏷️ Name: EdenVault SMM\n📞 Phone: 09-123-456-789\n\n📸 After payment, upload your screenshot as proof:`, {
+        chat_id: chatId,
+        message_id: msgId,
+      });
+    } else if (data === 'payment_wave') {
+      state.paymentType = 'Wave';
+      state.step = 'await_proof';
+      
+      await bot.editMessageText(`🌊 Wave Payment Details\n\n💰 Amount: ${state.mmk} MMK\n💲 Estimated: $${state.usd} USD\n\n📱 Please send to:\n🏷️ Name: EdenVault SMM\n📞 Phone: 09-987-654-321\n\n📸 After payment, upload your screenshot as proof:`, {
+        chat_id: chatId,
+        message_id: msgId,
+      });
     } else if (data.startsWith('approve_')) {
       const userId = data.split('_')[1];
       await bot.sendMessage(userId, "✅ Your top-up has been approved! Please check your SMM balance.");
@@ -213,9 +268,20 @@ bot.on('photo', async (msg) => {
     await bot.sendMessage(chatId, "✅ Thank you! Your proof has been sent for review. We'll notify you after approval.");
 
     // Send to admin
-    const amountDisplay = state.method === 'THB' ? `🇹🇭 THB: ${state.thb}` : `💵 MMK: ${state.mmk}`;
+    let amountDisplay, methodDisplay;
+    if (state.method === 'THB') {
+      amountDisplay = `🇹🇭 THB: ${state.thb}`;
+      methodDisplay = state.method;
+    } else if (state.method === 'MMK') {
+      amountDisplay = `💵 MMK: ${state.mmk}`;
+      methodDisplay = `${state.method} (${state.paymentType})`;
+    } else {
+      amountDisplay = `💵 MMK: ${state.mmk}`;
+      methodDisplay = state.method;
+    }
+    
     await bot.sendPhoto(ADMIN_ID, fileId, {
-      caption: `📥 New Top-up Request\n\n👤 Username: ${state.username}\n${amountDisplay}\n💲USD: $${state.usd}\n💳 Method: ${state.method}\n🆔 User: ${chatId}`,
+      caption: `📥 New Top-up Request\n\n👤 Username: ${state.username}\n${amountDisplay}\n💲USD: $${state.usd}\n💳 Method: ${methodDisplay}\n🆔 User: ${chatId}`,
       reply_markup: {
         inline_keyboard: [
           [
