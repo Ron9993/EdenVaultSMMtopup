@@ -16,6 +16,7 @@ if (!process.env.ADMIN_ID) {
 const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
 const ADMIN_ID = process.env.ADMIN_ID;
 const USD_RATE = 4510; // MMK per USD
+const THB_RATE = 36; // THB per USD
 
 let userStates = {}; // To track each user's flow
 
@@ -58,29 +59,52 @@ bot.on('message', async (msg) => {
         reply_markup: {
           inline_keyboard: [
             [{ text: '💵 MMK (KPay/Wave)', callback_data: 'method_mmk' }],
+            [{ text: '🇹🇭 THB (Thai Baht)', callback_data: 'method_thb' }],
             [{ text: '🪙 Crypto (USDT TRC20)', callback_data: 'method_crypto' }]
           ]
         },
       });
     } else if (state.step === 'enter_amount') {
-      const mmk = parseInt(msg.text);
+      const amount = parseInt(msg.text);
       
-      if (isNaN(mmk) || mmk <= 0) {
-        await bot.sendMessage(chatId, "❌ Please enter a valid number (MMK amount):");
+      if (isNaN(amount) || amount <= 0) {
+        const currency = state.method === 'THB' ? 'THB' : 'MMK';
+        await bot.sendMessage(chatId, `❌ Please enter a valid number (${currency} amount):`);
         return;
       }
 
-      if (mmk < 1000) {
-        await bot.sendMessage(chatId, "❌ Minimum amount is 1000 MMK. Please enter a higher amount:");
-        return;
+      let minAmount, currency, rate, usd;
+      
+      if (state.method === 'THB') {
+        minAmount = 50;
+        currency = 'THB';
+        rate = THB_RATE;
+        
+        if (amount < minAmount) {
+          await bot.sendMessage(chatId, `❌ Minimum amount is ${minAmount} THB. Please enter a higher amount:`);
+          return;
+        }
+        
+        usd = (amount / rate).toFixed(2);
+        state.thb = amount;
+      } else {
+        minAmount = 1000;
+        currency = 'MMK';
+        rate = USD_RATE;
+        
+        if (amount < minAmount) {
+          await bot.sendMessage(chatId, `❌ Minimum amount is ${minAmount} MMK. Please enter a higher amount:`);
+          return;
+        }
+        
+        usd = (amount / rate).toFixed(2);
+        state.mmk = amount;
       }
 
-      const usd = (mmk / USD_RATE).toFixed(2);
-      state.mmk = mmk;
       state.usd = usd;
       state.step = 'await_proof';
 
-      await bot.sendMessage(chatId, `📸 Please upload your payment proof now.\n\n💰 Amount: ${mmk} MMK\n💲 Estimated: $${usd} USD\n💳 Method: ${state.method}`);
+      await bot.sendMessage(chatId, `📸 Please upload your payment proof now.\n\n💰 Amount: ${amount} ${currency}\n💲 Estimated: $${usd} USD\n💳 Method: ${state.method}`);
     }
   } catch (error) {
     console.error('Error in message handler:', error.message);
@@ -100,6 +124,19 @@ bot.on('callback_query', async (query) => {
       state.step = 'enter_amount';
 
       await bot.editMessageText(`💰 Enter the MMK amount you want to top up:\n\n💱 Exchange Rate: 1 USD = ${USD_RATE} MMK\n\nPlease type the amount in MMK:`, {
+        chat_id: chatId,
+        message_id: msgId,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: 'Back', callback_data: 'back_to_method' }]
+          ]
+        },
+      });
+    } else if (data === 'method_thb') {
+      state.method = 'THB';
+      state.step = 'enter_amount';
+
+      await bot.editMessageText(`💰 Enter the THB amount you want to top up:\n\n💱 Exchange Rate: 1 USD = ${THB_RATE} THB\n\nPlease type the amount in THB:`, {
         chat_id: chatId,
         message_id: msgId,
         reply_markup: {
@@ -129,6 +166,7 @@ bot.on('callback_query', async (query) => {
         reply_markup: {
           inline_keyboard: [
             [{ text: '💵 MMK (KPay/Wave)', callback_data: 'method_mmk' }],
+            [{ text: '🇹🇭 THB (Thai Baht)', callback_data: 'method_thb' }],
             [{ text: '🪙 Crypto (USDT TRC20)', callback_data: 'method_crypto' }]
           ]
         },
@@ -175,8 +213,9 @@ bot.on('photo', async (msg) => {
     await bot.sendMessage(chatId, "✅ Thank you! Your proof has been sent for review. We'll notify you after approval.");
 
     // Send to admin
+    const amountDisplay = state.method === 'THB' ? `🇹🇭 THB: ${state.thb}` : `💵 MMK: ${state.mmk}`;
     await bot.sendPhoto(ADMIN_ID, fileId, {
-      caption: `📥 New Top-up Request\n\n👤 Username: ${state.username}\n💵 MMK: ${state.mmk}\n💲USD: $${state.usd}\n💳 Method: ${state.method}\n🆔 User: ${chatId}`,
+      caption: `📥 New Top-up Request\n\n👤 Username: ${state.username}\n${amountDisplay}\n💲USD: $${state.usd}\n💳 Method: ${state.method}\n🆔 User: ${chatId}`,
       reply_markup: {
         inline_keyboard: [
           [
