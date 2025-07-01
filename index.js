@@ -60,7 +60,7 @@ bot.on('message', async (msg) => {
           inline_keyboard: [
             [{ text: '💵 MMK (KPay/Wave)', callback_data: 'method_mmk' }],
             [{ text: '🇹🇭 THB (Thai Baht)', callback_data: 'method_thb' }],
-            [{ text: '🪙 Crypto (USDT TRC20)', callback_data: 'method_crypto' }]
+            [{ text: '🪙 Crypto (USDT)', callback_data: 'method_crypto' }]
           ]
         },
       });
@@ -211,7 +211,7 @@ bot.on('callback_query', async (query) => {
           inline_keyboard: [
             [{ text: '💵 MMK (KPay/Wave)', callback_data: 'method_mmk' }],
             [{ text: '🇹🇭 THB (Thai Baht)', callback_data: 'method_thb' }],
-            [{ text: '🪙 Crypto (USDT TRC20)', callback_data: 'method_crypto' }]
+            [{ text: '🪙 Crypto (USDT)', callback_data: 'method_crypto' }]
           ]
         },
       });
