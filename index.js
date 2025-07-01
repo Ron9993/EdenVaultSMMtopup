@@ -226,10 +226,41 @@ bot.on('callback_query', async (query) => {
         chat_id: chatId,
         message_id: msgId,
       });
-    } else if (data.startsWith('approve_')) {
+    } else if (data.startsWith('processing_')) {
       const userId = data.split('_')[1];
-      await bot.sendMessage(userId, "✅ Your top-up has been approved! Please check your SMM balance.");
-      await bot.editMessageCaption('✅ Approved and credited.', {
+      const userState = userStates[userId];
+      
+      await bot.sendMessage(userId, "🔄 Your top-up is being processed. Please wait...");
+      
+      // Update admin message with new buttons
+      let amountDisplay, methodDisplay;
+      if (userState.method === 'THB') {
+        amountDisplay = `🇹🇭 THB: ${userState.thb}`;
+        methodDisplay = userState.method;
+      } else if (userState.method === 'MMK') {
+        amountDisplay = `💵 MMK: ${userState.mmk}`;
+        methodDisplay = `${userState.method} (${userState.paymentType})`;
+      } else {
+        amountDisplay = `💵 MMK: ${userState.mmk}`;
+        methodDisplay = userState.method;
+      }
+      
+      await bot.editMessageCaption(`🔄 PROCESSING\n\n👤 Username: ${userState.username}\n${amountDisplay}\n💲USD: $${userState.usd}\n💳 Method: ${methodDisplay}\n🆔 User: ${userId}`, {
+        chat_id: query.message.chat.id,
+        message_id: query.message.message_id,
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: '✅ Credited', callback_data: `credited_${userId}` },
+              { text: '❌ Reject', callback_data: `reject_${userId}` },
+            ],
+          ],
+        },
+      });
+    } else if (data.startsWith('credited_')) {
+      const userId = data.split('_')[1];
+      await bot.sendMessage(userId, "✅ Your top-up has been credited! Please check your SMM balance.");
+      await bot.editMessageCaption('✅ Credited and completed.', {
         chat_id: query.message.chat.id,
         message_id: query.message.message_id,
       });
@@ -285,7 +316,7 @@ bot.on('photo', async (msg) => {
       reply_markup: {
         inline_keyboard: [
           [
-            { text: '✅ Approve', callback_data: `approve_${chatId}` },
+            { text: '🔄 Processing', callback_data: `processing_${chatId}` },
             { text: '❌ Reject', callback_data: `reject_${chatId}` },
           ],
         ],
