@@ -143,7 +143,10 @@ console.log('✅ EdenVault SMM Top-up Bot is running...');
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
   try {
-    userStates[chatId] = { step: 'select_language' };
+    userStates[chatId] = { 
+      step: 'select_language',
+      language: 'en' // Default language
+    };
     await bot.sendMessage(chatId, "👋 Welcome to EdenVault SMM Top-up Bot!\n欢迎使用EdenVault SMM充值机器人!\nEdenVault SMM Top-up Bot မှ ကြိုဆိုပါတယ်!\n\nPlease select your language / 请选择语言 / ဘာသာစကားရွေးချယ်ပါ:", {
       reply_markup: {
         inline_keyboard: [
@@ -281,6 +284,9 @@ bot.on('callback_query', async (query) => {
   try {
     if (data.startsWith('lang_')) {
       const lang = data.split('_')[1];
+      if (!userStates[chatId]) {
+        userStates[chatId] = {};
+      }
       userStates[chatId].language = lang;
       userStates[chatId].step = 'get_username';
 
