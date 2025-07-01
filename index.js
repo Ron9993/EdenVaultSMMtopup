@@ -1,4 +1,3 @@
-
 require('dotenv').config();
 const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs');
@@ -152,7 +151,8 @@ bot.onText(/\/start/, async (msg) => {
         inline_keyboard: [
           [{ text: '🇺🇸 English', callback_data: 'lang_en' }],
           [{ text: '🇨🇳 中文', callback_data: 'lang_zh' }],
-          [{ text: '🇲🇲 မြန်မာ', callback_data: 'lang_my' }]
+          [{ text: '🇲🇲 မြန်မာ', callback_data: 'lang_my' }],
+          [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
         ]
       }
     });
@@ -179,7 +179,8 @@ bot.on('message', async (msg) => {
           inline_keyboard: [
             [{ text: getText(chatId, 'mmk_method'), callback_data: 'method_mmk' }],
             [{ text: getText(chatId, 'thb_method'), callback_data: 'method_thb' }],
-            [{ text: getText(chatId, 'crypto_method'), callback_data: 'method_crypto' }]
+            [{ text: getText(chatId, 'crypto_method'), callback_data: 'method_crypto' }],
+            [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
           ]
         },
       });
@@ -214,7 +215,8 @@ bot.on('message', async (msg) => {
             inline_keyboard: [
               [{ text: getText(chatId, 'promptpay'), callback_data: 'thb_promptpay' }],
               [{ text: getText(chatId, 'bank_transfer'), callback_data: 'thb_bank' }],
-              [{ text: getText(chatId, 'back'), callback_data: 'back_to_amount_thb' }]
+              [{ text: getText(chatId, 'back'), callback_data: 'back_to_amount_thb' }],
+              [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
             ]
           }
         });
@@ -238,7 +240,8 @@ bot.on('message', async (msg) => {
             inline_keyboard: [
               [{ text: getText(chatId, 'kpay'), callback_data: 'payment_kpay' }],
               [{ text: getText(chatId, 'wave'), callback_data: 'payment_wave' }],
-              [{ text: getText(chatId, 'back'), callback_data: 'back_to_amount' }]
+              [{ text: getText(chatId, 'back'), callback_data: 'back_to_amount' }],
+              [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
             ]
           }
         });
@@ -263,7 +266,8 @@ bot.on('message', async (msg) => {
               [{ text: getText(chatId, 'binance'), callback_data: 'crypto_binance' }],
               [{ text: getText(chatId, 'usdt_trc20'), callback_data: 'crypto_usdt_trc20' }],
               [{ text: getText(chatId, 'usdt_bep20'), callback_data: 'crypto_usdt_bep20' }],
-              [{ text: getText(chatId, 'back'), callback_data: 'back_to_amount_crypto' }]
+              [{ text: getText(chatId, 'back'), callback_data: 'back_to_amount_crypto' }],
+              [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
             ]
           }
         });
@@ -303,7 +307,8 @@ bot.on('callback_query', async (query) => {
         message_id: msgId,
         reply_markup: {
           inline_keyboard: [
-            [{ text: getText(chatId, 'back'), callback_data: 'back_to_method' }]
+            [{ text: getText(chatId, 'back'), callback_data: 'back_to_method' }],
+            [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
           ]
         },
       });
@@ -316,7 +321,8 @@ bot.on('callback_query', async (query) => {
         message_id: msgId,
         reply_markup: {
           inline_keyboard: [
-            [{ text: getText(chatId, 'back'), callback_data: 'back_to_method' }]
+            [{ text: getText(chatId, 'back'), callback_data: 'back_to_method' }],
+            [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
           ]
         },
       });
@@ -329,7 +335,8 @@ bot.on('callback_query', async (query) => {
         message_id: msgId,
         reply_markup: {
           inline_keyboard: [
-            [{ text: getText(chatId, 'back'), callback_data: 'back_to_method' }]
+            [{ text: getText(chatId, 'back'), callback_data: 'back_to_method' }],
+            [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
           ]
         },
       });
@@ -342,7 +349,8 @@ bot.on('callback_query', async (query) => {
           inline_keyboard: [
             [{ text: getText(chatId, 'mmk_method'), callback_data: 'method_mmk' }],
             [{ text: getText(chatId, 'thb_method'), callback_data: 'method_thb' }],
-            [{ text: getText(chatId, 'crypto_method'), callback_data: 'method_crypto' }]
+            [{ text: getText(chatId, 'crypto_method'), callback_data: 'method_crypto' }],
+            [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
           ]
         },
       });
@@ -353,7 +361,8 @@ bot.on('callback_query', async (query) => {
         message_id: msgId,
         reply_markup: {
           inline_keyboard: [
-            [{ text: getText(chatId, 'back'), callback_data: 'back_to_method' }]
+            [{ text: getText(chatId, 'back'), callback_data: 'back_to_method' }],
+            [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
           ]
         },
       });
@@ -396,7 +405,8 @@ bot.on('callback_query', async (query) => {
         message_id: msgId,
         reply_markup: {
           inline_keyboard: [
-            [{ text: getText(chatId, 'back'), callback_data: 'back_to_method' }]
+            [{ text: getText(chatId, 'back'), callback_data: 'back_to_method' }],
+            [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
           ]
         },
       });
@@ -407,7 +417,8 @@ bot.on('callback_query', async (query) => {
         message_id: msgId,
         reply_markup: {
           inline_keyboard: [
-            [{ text: getText(chatId, 'back'), callback_data: 'back_to_method' }]
+            [{ text: getText(chatId, 'back'), callback_data: 'back_to_method' }],
+              [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
           ]
         },
       });
@@ -463,6 +474,7 @@ bot.on('callback_query', async (query) => {
               { text: '✅ Credited', callback_data: `credited_${userId}` },
               { text: '❌ Reject', callback_data: `reject_${userId}` },
             ],
+            [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
           ],
         },
       });
@@ -486,6 +498,9 @@ bot.on('callback_query', async (query) => {
 
       // Clean up user state
       delete userStates[userId];
+    } else if (data === 'back_to_menu') {
+        // Handle the menu callback
+        await bot.sendMessage(chatId, "📋 Menu Options:\n\n/start - Restart the bot\n/help - Get help"); // Customize menu options
     }
 
     await bot.answerCallbackQuery(query.id);
@@ -528,6 +543,7 @@ bot.on('photo', async (msg) => {
             { text: '🔄 Processing', callback_data: `processing_${chatId}` },
             { text: '❌ Reject', callback_data: `reject_${chatId}` },
           ],
+          [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
         ],
       },
     });
