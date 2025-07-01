@@ -56,47 +56,56 @@ bot.on('message', async (msg) => {
 
       await bot.sendMessage(chatId, "💳 Choose your top-up method:", {
         reply_markup: {
-          keyboard: [['💵 MMK (KPay/Wave)', '🪙 Crypto (USDT TRC20)']],
-          one_time_keyboard: true,
-          resize_keyboard: true,
+          inline_keyboard: [
+            [{ text: '💵 MMK (KPay/Wave)', callback_data: 'method_mmk' }],
+            [{ text: '🪙 Crypto (USDT TRC20)', callback_data: 'method_crypto' }]
+          ]
         },
       });
-    } else if (state.step === 'select_method') {
-      if (msg.text.includes('MMK')) {
-        state.method = 'MMK';
-        state.step = 'select_amount';
-        await bot.sendMessage(chatId, "💰 Choose MMK amount to top up:", {
-          reply_markup: {
-            keyboard: [['3000', '5000', '10000'], ['Back']],
-            one_time_keyboard: true,
-            resize_keyboard: true,
-          },
-        });
-      } else if (msg.text.includes('Crypto')) {
-        state.method = 'Crypto';
-        state.step = 'select_amount';
-        await bot.sendMessage(chatId, "💰 Choose Crypto amount (in MMK):", {
-          reply_markup: {
-            keyboard: [['3000', '5000', '10000'], ['Back']],
-            one_time_keyboard: true,
-            resize_keyboard: true,
-          },
-        });
-      }
-    } else if (state.step === 'select_amount') {
-      if (msg.text === 'Back') {
-        state.step = 'select_method';
-        await bot.sendMessage(chatId, "💳 Choose your top-up method again:", {
-          reply_markup: {
-            keyboard: [['💵 MMK (KPay/Wave)', '🪙 Crypto (USDT TRC20)']],
-            one_time_keyboard: true,
-            resize_keyboard: true,
-          },
-        });
-        return;
-      }
+    }
+  } catch (error) {
+    console.error('Error in message handler:', error.message);
+    await bot.sendMessage(chatId, "❌ Something went wrong. Please try again or use /start to restart.");
+  }
+});
 
-      const mmk = parseInt(msg.text);
+bot.on('callback_query', async (query) => {
+  const chatId = query.message.chat.id;
+  const msgId = query.message.message_id;
+  const data = query.data;
+  const state = userStates[chatId];
+
+  try {
+    if (data === 'method_mmk') {
+      state.method = 'MMK';
+      state.step = 'select_amount';
+
+      await bot.editMessageText("💰 Choose MMK amount to top up:", {
+        chat_id: chatId,
+        message_id: msgId,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '3000', callback_data: 'amount_3000' }, { text: '5000', callback_data: 'amount_5000' }, { text: '10000', callback_data: 'amount_10000' }],
+            [{ text: 'Back', callback_data: 'back_to_method' }]
+          ]
+        },
+      });
+    } else if (data === 'method_crypto') {
+      state.method = 'Crypto';
+      state.step = 'select_amount';
+
+      await bot.editMessageText("💰 Choose Crypto amount (in MMK):", {
+        chat_id: chatId,
+        message_id: msgId,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '3000', callback_data: 'amount_3000' }, { text: '5000', callback_data: 'amount_5000' }, { text: '10000', callback_data: 'amount_10000' }],
+            [{ text: 'Back', callback_data: 'back_to_method' }]
+          ]
+        },
+      });
+    } else if (data.startsWith('amount_')) {
+      const mmk = parseInt(data.split('_')[1]);
       if (isNaN(mmk)) return;
 
       const usd = (mmk / USD_RATE).toFixed(2);
@@ -104,13 +113,51 @@ bot.on('message', async (msg) => {
       state.usd = usd;
       state.step = 'await_proof';
 
-      await bot.sendMessage(chatId, `📸 Please upload your payment proof now.\n\nAmount: ${mmk} MMK\nEstimated: $${usd} USD`);
+      await bot.editMessageText(`📸 Please upload your payment proof now.\n\nAmount: ${mmk} MMK\nEstimated: $${usd} USD`, {
+        chat_id: chatId,
+        message_id: msgId,
+      });
+    } else if (data === 'back_to_method') {
+      state.step = 'select_method';
+      await bot.editMessageText("💳 Choose your top-up method:", {
+        chat_id: chatId,
+        message_id: msgId,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: '💵 MMK (KPay/Wave)', callback_data: 'method_mmk' }],
+            [{ text: '🪙 Crypto (USDT TRC20)', callback_data: 'method_crypto' }]
+          ]
+        },
+      });
+    } else if (data.startsWith('approve_')) {
+      const userId = data.split('_')[1];
+      await bot.sendMessage(userId, "✅ Your top-up has been approved! Please check your SMM balance.");
+      await bot.editMessageCaption('✅ Approved and credited.', {
+        chat_id: query.message.chat.id,
+        message_id: query.message.message_id,
+      });
+
+      // Clean up user state
+      delete userStates[userId];
+    } else if (data.startsWith('reject_')) {
+      const userId = data.split('_')[1];
+      await bot.sendMessage(userId, "❌ Your top-up was rejected. Please contact support if this is a mistake.");
+      await bot.editMessageCaption('❌ Rejected.', {
+        chat_id: query.message.chat.id,
+        message_id: query.message.message_id,
+      });
+
+      // Clean up user state
+      delete userStates[userId];
     }
+
+    await bot.answerCallbackQuery(query.id);
   } catch (error) {
-    console.error('Error in message handler:', error.message);
-    await bot.sendMessage(chatId, "❌ Something went wrong. Please try again or use /start to restart.");
+    console.error('Error in callback query handler:', error.message);
+    await bot.answerCallbackQuery(query.id, { text: "❌ Something went wrong" });
   }
 });
+
 
 // Handle Proof Upload
 bot.on('photo', async (msg) => {
@@ -144,38 +191,3 @@ bot.on('photo', async (msg) => {
 });
 
 // Admin Actions
-bot.on('callback_query', async (query) => {
-  const data = query.data;
-  const msg = query.message;
-
-  try {
-    if (data.startsWith('approve_')) {
-      const userId = data.split('_')[1];
-      await bot.sendMessage(userId, "✅ Your top-up has been approved! Please check your SMM balance.");
-      await bot.editMessageCaption('✅ Approved and credited.', {
-        chat_id: msg.chat.id,
-        message_id: msg.message_id,
-      });
-      
-      // Clean up user state
-      delete userStates[userId];
-    }
-
-    if (data.startsWith('reject_')) {
-      const userId = data.split('_')[1];
-      await bot.sendMessage(userId, "❌ Your top-up was rejected. Please contact support if this is a mistake.");
-      await bot.editMessageCaption('❌ Rejected.', {
-        chat_id: msg.chat.id,
-        message_id: msg.message_id,
-      });
-      
-      // Clean up user state
-      delete userStates[userId];
-    }
-
-    await bot.answerCallbackQuery(query.id);
-  } catch (error) {
-    console.error('Error in callback query handler:', error.message);
-    await bot.answerCallbackQuery(query.id, { text: "❌ Something went wrong" });
-  }
-});
