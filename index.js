@@ -138,6 +138,345 @@ bot.on('error', (error) => {
 
 console.log('✅ EdenVault SMM Top-up Bot is running...');
 
+// Help Command
+bot.onText(/\/help/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userLang = userStates[chatId]?.language || 'en';
+
+  const helpText = {
+    en: `🤖 **EdenVault SMM Bot Commands**
+
+🔧 **Available Commands:**
+• /start - Start the bot and select language
+• /help - Show this help message
+• /balance - Check your account balance
+• /history - View your transaction history
+• /support - Contact support
+• /rates - View current exchange rates
+
+💳 **Payment Methods:**
+• MMK (KPay/Wave)
+• THB (PromptPay/Bank Transfer)
+• Crypto (Binance, USDT TRC20/BEP20)
+
+📞 **Need Help?** Use /support to contact our team!`,
+    zh: `🤖 **EdenVault SMM 机器人命令**
+
+🔧 **可用命令:**
+• /start - 启动机器人并选择语言
+• /help - 显示此帮助信息
+• /balance - 查看账户余额
+• /history - 查看交易历史
+• /support - 联系客服
+• /rates - 查看当前汇率
+
+💳 **支付方式:**
+• 缅甸币 (KPay/Wave)
+• 泰铢 (PromptPay/银行转账)
+• 加密货币 (币安, USDT TRC20/BEP20)
+
+📞 **需要帮助?** 使用 /support 联系我们的团队！`,
+    my: `🤖 **EdenVault SMM Bot ညွှန်ကြားချက်များ**
+
+🔧 **အသုံးပြုနိုင်သော ညွှန်ကြားချက်များ:**
+• /start - Bot ကို စတင်ပြီး ဘာသာစကား ရွေးချယ်ပါ
+• /help - ဤအကူအညီကို ပြပါ
+• /balance - သင့်အကောင့် လက်ကျန်ငွေကို စစ်ဆေးပါ
+• /history - သင့်ငွေလွှဲမှတ်တမ်းကို ကြည့်ပါ
+• /support - အကူအညီ ဆက်သွယ်ပါ
+• /rates - လက်ရှိလဲလှယ်နှုန်းကို ကြည့်ပါ
+
+💳 **ငွေပေးချေမှုနည်းလမ်းများ:**
+• ကျပ် (KPay/Wave)
+• ဘတ် (PromptPay/ဘဏ်လွှဲ)
+• Crypto (Binance, USDT TRC20/BEP20)
+
+📞 **အကူအညီလိုပါသလား?** /support သုံး၍ ကျွန်ုပ်တို့အဖွဲ့နှင့် ဆက်သွယ်ပါ！`
+  };
+
+  try {
+    await bot.sendMessage(chatId, helpText[userLang], { parse_mode: 'Markdown' });
+  } catch (error) {
+    console.error('Error in /help command:', error.message);
+  }
+});
+
+// Balance Command
+bot.onText(/\/balance/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userLang = userStates[chatId]?.language || 'en';
+
+  const balanceText = {
+    en: `💰 **Account Balance Check**
+
+To check your EdenVault SMM balance:
+1. Login to your EdenVault account
+2. Visit: https://edenvault.com/balance
+3. Or check in your SMM panel dashboard
+
+🔄 Recent top-ups will reflect within 5-10 minutes after admin approval.
+
+Need help? Use /support`,
+    zh: `💰 **账户余额查询**
+
+查看您的 EdenVault SMM 余额:
+1. 登录您的 EdenVault 账户
+2. 访问: https://edenvault.com/balance
+3. 或在您的 SMM 面板仪表板中查看
+
+🔄 最近的充值将在管理员批准后 5-10 分钟内反映。
+
+需要帮助? 使用 /support`,
+    my: `💰 **အကောင့်လက်ကျန်ငွေ စစ်ဆေးခြင်း**
+
+သင့် EdenVault SMM လက်ကျန်ငွေကို စစ်ဆေးရန်:
+1. သင့် EdenVault အကောင့်သို့ လော့ဂ်အင်ဝင်ပါ
+2. ဝင်ရောက်ပါ: https://edenvault.com/balance
+3. သို့မဟုတ် သင့် SMM panel dashboard တွင် စစ်ဆေးပါ
+
+🔄 လတ်တလောငွေဖြည့်မှုများသည် admin အတည်ပြုပြီးနောက် ၅-၁၀ မိနစ်အတွင်း ပြသပါမည်။
+
+အကူအညီလိုပါသလား? /support ကိုသုံးပါ`
+  };
+
+  try {
+    await bot.sendMessage(chatId, balanceText[userLang], { parse_mode: 'Markdown' });
+  } catch (error) {
+    console.error('Error in /balance command:', error.message);
+  }
+});
+
+// History Command
+bot.onText(/\/history/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userLang = userStates[chatId]?.language || 'en';
+
+  const historyText = {
+    en: `📋 **Transaction History**
+
+To view your complete transaction history:
+1. Login to your EdenVault account
+2. Go to: https://edenvault.com/transactions
+3. Filter by date range if needed
+
+📊 You can also view:
+• Pending transactions
+• Completed top-ups
+• Failed transactions
+• Refund status
+
+💡 For specific transaction inquiries, use /support with your transaction ID.`,
+    zh: `📋 **交易历史**
+
+查看您的完整交易历史:
+1. 登录您的 EdenVault 账户
+2. 前往: https://edenvault.com/transactions
+3. 如需要可按日期范围筛选
+
+📊 您还可以查看:
+• 待处理交易
+• 已完成充值
+• 失败交易
+• 退款状态
+
+💡 如有特定交易询问，请使用 /support 并提供您的交易ID。`,
+    my: `📋 **ငွေလွှဲမှတ်တမ်း**
+
+သင့်ငွေလွှဲမှတ်တမ်း အပြည့်အစုံကို ကြည့်ရန်:
+1. သင့် EdenVault အကောင့်သို့ လော့ဂ်အင်ဝင်ပါ
+2. သွားပါ: https://edenvault.com/transactions
+3. လိုအပ်ပါက ရက်စွဲအပိုင်းအခြားဖြင့် စစ်ထုတ်ပါ
+
+📊 သင်ကြည့်နိုင်သေးတာများ:
+• စောင့်ဆိုင်းနေသောငွေလွှဲများ
+• ပြီးစီးသောငွေဖြည့်များ
+• မအောင်မြင်သောငွေလွှဲများ
+• ငွေပြန်အခြေအနေ
+
+💡 တိကျသောငွေလွှဲမေးခွန်းများအတွက်၊ သင့်ငွေလွှဲ ID နှင့်အတူ /support ကိုသုံးပါ။`
+  };
+
+  try {
+    await bot.sendMessage(chatId, historyText[userLang], { parse_mode: 'Markdown' });
+  } catch (error) {
+    console.error('Error in /history command:', error.message);
+  }
+});
+
+// Support Command
+bot.onText(/\/support/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userLang = userStates[chatId]?.language || 'en';
+
+  const supportText = {
+    en: `🆘 **Customer Support**
+
+📞 **Contact Methods:**
+• Telegram: @EdenVaultSupport
+• Email: support@edenvault.com
+• Live Chat: https://edenvault.com/support
+
+⏰ **Support Hours:**
+• Monday - Friday: 9:00 AM - 6:00 PM (GMT+7)
+• Saturday: 10:00 AM - 4:00 PM (GMT+7)  
+• Sunday: Emergency support only
+
+🚨 **For Urgent Issues:**
+• Failed payments: Include transaction screenshot
+• Account problems: Provide your username
+• Technical issues: Describe the problem clearly
+
+📧 **Email Template:**
+Subject: [URGENT] Your Issue Here
+- Username: Your EdenVault username
+- Issue: Describe your problem
+- Screenshots: Attach relevant images`,
+    zh: `🆘 **客户支持**
+
+📞 **联系方式:**
+• Telegram: @EdenVaultSupport
+• 邮箱: support@edenvault.com
+• 在线客服: https://edenvault.com/support
+
+⏰ **支持时间:**
+• 周一至周五: 上午9:00 - 下午6:00 (GMT+7)
+• 周六: 上午10:00 - 下午4:00 (GMT+7)
+• 周日: 仅紧急支持
+
+🚨 **紧急问题:**
+• 支付失败: 请包含交易截图
+• 账户问题: 请提供您的用户名
+• 技术问题: 请清楚描述问题
+
+📧 **邮件模板:**
+主题: [紧急] 您的问题描述
+- 用户名: 您的 EdenVault 用户名
+- 问题: 描述您的问题
+- 截图: 附上相关图片`,
+    my: `🆘 **ဖောက်သည်အကူအညီ**
+
+📞 **ဆက်သွယ်နည်းများ:**
+• Telegram: @EdenVaultSupport
+• Email: support@edenvault.com
+• Live Chat: https://edenvault.com/support
+
+⏰ **အကူအညီချိန်ပိုင်းများ:**
+• တနင်္လာ - သောကြာ: နံနက် ၉:၀၀ - ညနေ ၆:၀၀ (GMT+7)
+• စနေ: နံနက် ၁၀:၀၀ - ညနေ ၄:၀၀ (GMT+7)
+• တနင်္ဂနွေ: အရေးပေါ်အကူအညီသာ
+
+🚨 **အရေးပေါ်ပြဿနာများအတွက်:**
+• ငွေပေးမှုမအောင်မြင်ခြင်း: ငွေလွှဲစခရင်ရှော့ထည့်ပါ
+• အကောင့်ပြဿနာများ: သင့်အသုံးပြုသူအမည်ပေးပါ
+• နည်းပညာပြဿနာများ: ပြဿနာကို ရှင်းလင်းစွာဖော်ပြပါ
+
+📧 **Email ပုံစံ:**
+ခေါင်းစဉ်: [အရေးပေါ်] သင့်ပြဿနာဒီမှာ
+- အသုံးပြုသူအမည်: သင့် EdenVault အသုံးပြုသူအမည်
+- ပြဿနာ: သင့်ပြဿနာကိုဖော်ပြပါ
+- ရုပ်ပုံများ: သက်ဆိုင်ရာပုံများတွဲပါ`
+  };
+
+  try {
+    await bot.sendMessage(chatId, supportText[userLang], { parse_mode: 'Markdown' });
+  } catch (error) {
+    console.error('Error in /support command:', error.message);
+  }
+});
+
+// Rates Command
+bot.onText(/\/rates/, async (msg) => {
+  const chatId = msg.chat.id;
+  const userLang = userStates[chatId]?.language || 'en';
+
+  const ratesText = {
+    en: `💱 **Current Exchange Rates**
+
+🇺🇸 **USD Base Currency**
+💵 MMK: 1 USD = ${USD_RATE} MMK
+🇹🇭 THB: 1 USD = ${THB_RATE} THB
+🪙 USDT: 1 USD = 1 USDT
+
+📊 **Minimum Amounts:**
+• MMK: 1,000 MMK minimum
+• THB: 50 THB minimum  
+• USDT: 1 USD minimum
+
+⚠️ **Note:** Rates are updated regularly and may vary slightly during processing.
+
+🔄 Last updated: ${new Date().toLocaleDateString()}`,
+    zh: `💱 **当前汇率**
+
+🇺🇸 **美元基准货币**
+💵 缅甸币: 1美元 = ${USD_RATE} 缅甸币
+🇹🇭 泰铢: 1美元 = ${THB_RATE} 泰铢
+🪙 USDT: 1美元 = 1 USDT
+
+📊 **最低金额:**
+• 缅甸币: 最低 1,000 缅甸币
+• 泰铢: 最低 50 泰铢
+• USDT: 最低 1 美元
+
+⚠️ **注意:** 汇率定期更新，处理过程中可能略有变化。
+
+🔄 最后更新: ${new Date().toLocaleDateString()}`,
+    my: `💱 **လက်ရှိလဲလှယ်နှုန်းများ**
+
+🇺🇸 **ဒေါ်လာ အခြေခံငွေကြေး**
+💵 ကျပ်: ၁ ဒေါ်လာ = ${USD_RATE} ကျပ်
+🇹🇭 ဘတ်: ၁ ဒေါ်လာ = ${THB_RATE} ဘတ်
+🪙 USDT: ၁ ဒေါ်လာ = ၁ USDT
+
+📊 **အနည်းဆုံးပမာဏများ:**
+• ကျပ်: အနည်းဆုံး ၁,၀၀၀ ကျပ်
+• ဘတ်: အနည်းဆုံး ၅၀ ဘတ်
+• USDT: အနည်းဆုံး ၁ ဒေါ်လာ
+
+⚠️ **မှတ်ချက်:** နှုန်းများကို ပုံမှန်အပ်ဒိတ်လုပ်ပြီး လုပ်ဆောင်နေစဉ်အတွင်း အနည်းငယ်ကွဲပြားနိုင်ပါသည်။
+
+🔄 နောက်ဆုံးအပ်ဒိတ်: ${new Date().toLocaleDateString()}`
+  };
+
+  try {
+    await bot.sendMessage(chatId, ratesText[userLang], { parse_mode: 'Markdown' });
+  } catch (error) {
+    console.error('Error in /rates command:', error.message);
+  }
+});
+
+// Admin Stats Command (only for admin)
+bot.onText(/\/stats/, async (msg) => {
+  const chatId = msg.chat.id;
+
+  if (chatId.toString() !== ADMIN_ID) {
+    return bot.sendMessage(chatId, "❌ You don't have permission to use this command.");
+  }
+
+  try {
+    const totalUsers = Object.keys(userStates).length;
+    const activeUsers = Object.values(userStates).filter(state => state.step && state.step !== 'waiting_admin').length;
+    const pendingRequests = Object.values(userStates).filter(state => state.step === 'waiting_admin').length;
+
+    const statsText = `📊 **Bot Statistics**
+
+👥 **Users:**
+• Total users: ${totalUsers}
+• Active sessions: ${activeUsers}
+• Pending requests: ${pendingRequests}
+
+⚡ **System:**
+• Bot uptime: ${process.uptime().toFixed(0)} seconds
+• Memory usage: ${(process.memoryUsage().heapUsed / 1024 / 1024).toFixed(2)} MB
+• Node version: ${process.version}
+
+🔄 **Last restart:** ${new Date().toLocaleString()}`;
+
+    await bot.sendMessage(chatId, statsText, { parse_mode: 'Markdown' });
+  } catch (error) {
+    console.error('Error in /stats command:', error.message);
+  }
+});
+
 // Start
 bot.onText(/\/start/, async (msg) => {
   const chatId = msg.chat.id;
