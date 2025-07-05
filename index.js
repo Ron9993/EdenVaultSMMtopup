@@ -709,7 +709,7 @@ bot.on('callback_query', async (query) => {
       state.paymentType = 'KPay';
       state.step = 'await_proof';
 
-      await bot.editMessageText(`💳 KPay ${getText(chatId, 'payment_details')}\n\n💰 ${getText(chatId, 'choose_method') === getText(chatId, 'choose_method') ? 'Amount' : 'ပမာဏ'}: ${state.mmk} MMK\n💲 USD: $${state.usd}\n\n📱 Please send to:\n🏷️ Name: EdenVault SMM\n📞 Phone: 09-123-456-789\n\n${getText(chatId, 'upload_proof')}`, {
+      await bot.editMessageText(`💳 KPay ${getText(chatId, 'payment_details')}\n\n💰 ${getText(chatId, 'choose_method') === getText(chatId, 'choose_method') ? 'Amount' : 'ပမာဏ'}: ${state.mmk} MMK\n💲 USD: $${state.usd}\n\n📱 Please send to:\n🏷️ Name: Win Thuzar\n📞 Phone: 09760301586\n\n${getText(chatId, 'upload_proof')}`, {
         chat_id: chatId,
         message_id: msgId,
       });
@@ -717,7 +717,7 @@ bot.on('callback_query', async (query) => {
       state.paymentType = 'Wave';
       state.step = 'await_proof';
 
-      await bot.editMessageText(`🌊 Wave ${getText(chatId, 'payment_details')}\n\n💰 Amount: ${state.mmk} MMK\n💲 USD: $${state.usd}\n\n📱 Please send to:\n🏷️ Name: EdenVault SMM\n📞 Phone: 09-987-654-321\n\n${getText(chatId, 'upload_proof')}`, {
+      await bot.editMessageText(`🌊 Wave ${getText(chatId, 'payment_details')}\n\n💰 Amount: ${state.mmk} MMK\n💲 USD: $${state.usd}\n\n📱 Please send to:\n🏷️ Name: Zar Zar Phoo\n📞 Phone: 09760301586\n\n${getText(chatId, 'upload_proof')}`, {
         chat_id: chatId,
         message_id: msgId,
       });
@@ -765,7 +765,7 @@ bot.on('callback_query', async (query) => {
       state.paymentType = 'Binance';
       state.step = 'await_proof';
 
-      await bot.editMessageText(`🏦 ${getText(chatId, 'binance')} ${getText(chatId, 'payment_details')}\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🏷️ Binance ID: EdenVaultSMM\n📧 Email: payments@edenvault.com\n\n${getText(chatId, 'upload_proof')}`, {
+      await bot.editMessageText(`🏦 ${getText(chatId, 'binance')} ${getText(chatId, 'payment_details')}\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🏷️ Nickname: TaronWu\n🆔 Binance ID: 137954961\n\n${getText(chatId, 'upload_proof')}`, {
         chat_id: chatId,
         message_id: msgId,
       });
@@ -773,7 +773,7 @@ bot.on('callback_query', async (query) => {
       state.paymentType = 'USDT TRC20';
       state.step = 'await_proof';
 
-      await bot.editMessageText(`₮ ${getText(chatId, 'usdt_trc20')} ${getText(chatId, 'payment_details')}\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🔗 TRC20 Address:\nTXYZ123ABC456DEF789GHI012JKL345MNO678\n\n⚠️ Only send USDT on TRC20 network!\n\n${getText(chatId, 'upload_proof')}`, {
+      await bot.editMessageText(`₮ ${getText(chatId, 'usdt_trc20')} ${getText(chatId, 'payment_details')}\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🔗 TRC20 Address:\nTPEzUBycdj9MDcJVNEYSP8TCRjx1gMG7LN\n\n⚠️ Only send USDT on TRC20 network!\n\n${getText(chatId, 'upload_proof')}`, {
         chat_id: chatId,
         message_id: msgId,
       });
@@ -781,7 +781,7 @@ bot.on('callback_query', async (query) => {
       state.paymentType = 'USDT BEP20';
       state.step = 'await_proof';
 
-      await bot.editMessageText(`₮ ${getText(chatId, 'usdt_bep20')} ${getText(chatId, 'payment_details')}\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🔗 BEP20 Address:\n0xABC123DEF456GHI789JKL012MNO345PQR678\n\n⚠️ Only send USDT on BEP20 network!\n\n${getText(chatId, 'upload_proof')}`, {
+      await bot.editMessageText(`₮ ${getText(chatId, 'usdt_bep20')} ${getText(chatId, 'payment_details')}\n\n💰 Amount: $${state.usd} USD\n\n📱 Please send to:\n🔗 BEP20 Address:\n0xc47964619fbac4c167067e3c4bdc70ff0b4e5c1c\n\n⚠️ Only send USDT on BEP20 network!\n\n${getText(chatId, 'upload_proof')}`, {
         chat_id: chatId,
         message_id: msgId,
       });
