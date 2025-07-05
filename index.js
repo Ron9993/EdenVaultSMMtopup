@@ -722,18 +722,16 @@ bot.on('callback_query', async (query) => {
         message_id: msgId,
       });
     } else if (data === 'thb_promptpay') {
-      await bot.editMessageText(`💳 PromptPay ${getText(chatId, 'payment_details')}\n\n⚠️ Currently Unavailable\n\nThis payment method is temporarily unavailable. Please choose another payment option.\n\n${getText(chatId, 'choose_thb_payment')}`, {
-        chat_id: chatId,
-        message_id: msgId,
-        reply_markup: {
-          inline_keyboard: [
-            [{ text: getText(chatId, 'promptpay'), callback_data: 'thb_promptpay' }],
-            [{ text: getText(chatId, 'bank_transfer'), callback_data: 'thb_bank' }],
-            [{ text: getText(chatId, 'back'), callback_data: 'back_to_amount_thb' }],
-            [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
-          ]
-        }
+      state.paymentType = 'PromptPay';
+      state.step = 'await_proof';
+
+      // Send the QR code image with payment details
+      await bot.sendPhoto(chatId, './attached_assets/IMG_3070_1751707954226.jpeg', {
+        caption: `💳 PromptPay ${getText(chatId, 'payment_details')}\n\n💰 Amount: ${state.thb} THB\n💲 USD: $${state.usd}\n\n📱 Scan QR Code or send to PromptPay ID shown in the image\n\n${getText(chatId, 'upload_proof')}`
       });
+
+      // Delete the previous message
+      await bot.deleteMessage(chatId, msgId);
     } else if (data === 'thb_bank') {
       await bot.editMessageText(`🏦 ${getText(chatId, 'bank_transfer')} ${getText(chatId, 'payment_details')}\n\n⚠️ Currently Unavailable\n\nThis payment method is temporarily unavailable. Please choose another payment option.\n\n${getText(chatId, 'choose_thb_payment')}`, {
         chat_id: chatId,
