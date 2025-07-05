@@ -86,7 +86,7 @@ const translations = {
   },
   my: {
     welcome: "👋 EdenVault SMM Top-up Bot မှ ကြိုဆိုပါတယ်!\n\nကျေးဇူးပြု၍ သင့်ဘာသာစကားကို ရွေးချယ်ပါ:",
-    enter_username: "ကျေးဇူးပြု၍ သင့် EdenVault အမည်ကို ရိုက်ထည့်ပါ:",
+    enter_username: "ကျေးဇူးပြု၍ သင့် EdenVault username ရိုက်ထည့်ပါ:",
     choose_method: "💳 သင့်အတွက် ငွေဖြည့်နည်းလမ်းကို ရွေးချယ်ပါ:",
     mmk_method: "💵 ကျပ် (KPay/Wave)",
     thb_method: "🇹🇭 ဘတ် (Thai Baht)",
