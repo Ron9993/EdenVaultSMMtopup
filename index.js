@@ -733,13 +733,14 @@ bot.on('callback_query', async (query) => {
       // Delete the previous message
       await bot.deleteMessage(chatId, msgId);
     } else if (data === 'thb_bank') {
-      await bot.editMessageText(`🏦 ${getText(chatId, 'bank_transfer')} ${getText(chatId, 'payment_details')}\n\n⚠️ Currently Unavailable\n\nThis payment method is temporarily unavailable. Please choose another payment option.\n\n${getText(chatId, 'choose_thb_payment')}`, {
+      await bot.editMessageText(`🏦 ${getText(chatId, 'bank_transfer')} ${getText(chatId, 'payment_details')}\n\n📞 Please Contact Customer Service\n\nFor bank transfer payments, please contact our customer service admin to get the bank details and complete your transaction.\n\nUse /support to get contact information.\n\n${getText(chatId, 'choose_thb_payment')}`, {
         chat_id: chatId,
         message_id: msgId,
         reply_markup: {
           inline_keyboard: [
             [{ text: getText(chatId, 'promptpay'), callback_data: 'thb_promptpay' }],
             [{ text: getText(chatId, 'bank_transfer'), callback_data: 'thb_bank' }],
+            [{ text: '📞 Contact Support', callback_data: 'contact_support' }],
             [{ text: getText(chatId, 'back'), callback_data: 'back_to_amount_thb' }],
             [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
           ]
@@ -845,6 +846,16 @@ bot.on('callback_query', async (query) => {
 
       // Clean up user state
       delete userStates[userId];
+    } else if (data === 'contact_support') {
+      const userLang = userStates[chatId]?.language || 'en';
+      
+      const supportText = {
+        en: `🆘 **Customer Support**\n\n📞 **Contact Methods:**\n• Telegram: @EdenVaultSupport\n• Email: support@edenvault.com\n\n⏰ **Support Hours:**\n• Monday - Friday: 9:00 AM - 6:00 PM (GMT+7)\n• Saturday: 10:00 AM - 4:00 PM (GMT+7)\n\n💡 **For Bank Transfer:** Please mention you need bank details for THB transfer.`,
+        zh: `🆘 **客户支持**\n\n📞 **联系方式:**\n• Telegram: @EdenVaultSupport\n• 邮箱: support@edenvault.com\n\n⏰ **支持时间:**\n• 周一至周五: 上午9:00 - 下午6:00 (GMT+7)\n• 周六: 上午10:00 - 下午4:00 (GMT+7)\n\n💡 **银行转账:** 请说明您需要泰铢转账的银行详情。`,
+        my: `🆘 **ဖောက်သည်အကူအညီ**\n\n📞 **ဆက်သွယ်နည်းများ:**\n• Telegram: @EdenVaultSupport\n• Email: support@edenvault.com\n\n⏰ **အကူအညီချိန်ပိုင်းများ:**\n• တနင်္လာ - သောကြာ: နံနက် ၉:၀၀ - ညနေ ၆:၀၀ (GMT+7)\n• စနေ: နံနက် ၁၀:၀၀ - ညနေ ၄:၀၀ (GMT+7)\n\n💡 **ဘဏ်လွှဲအတွက်:** THB လွှဲရန်အတွက် ဘဏ်အသေးစိတ်လိုအပ်ကြောင်း ပြောပါ။`
+      };
+
+      await bot.sendMessage(chatId, supportText[userLang], { parse_mode: 'Markdown' });
     } else if (data === 'back_to_menu') {
         // Handle the menu callback
         await bot.sendMessage(chatId, "📋 Menu Options:\n\n/start - Restart the bot\n/help - Get help"); // Customize menu options
