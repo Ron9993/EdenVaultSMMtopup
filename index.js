@@ -722,20 +722,30 @@ bot.on('callback_query', async (query) => {
         message_id: msgId,
       });
     } else if (data === 'thb_promptpay') {
-      state.paymentType = 'PromptPay';
-      state.step = 'await_proof';
-
-      await bot.editMessageText(`💳 PromptPay ${getText(chatId, 'payment_details')}\n\n💰 Amount: ${state.thb} THB\n💲 USD: $${state.usd}\n\n📱 Please send to:\n🏷️ Name: EdenVault SMM\n📞 PromptPay ID: 0123456789\n🏦 Bank: Kasikorn Bank\n\n${getText(chatId, 'upload_proof')}`, {
+      await bot.editMessageText(`💳 PromptPay ${getText(chatId, 'payment_details')}\n\n⚠️ Currently Unavailable\n\nThis payment method is temporarily unavailable. Please choose another payment option.\n\n${getText(chatId, 'choose_thb_payment')}`, {
         chat_id: chatId,
         message_id: msgId,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: getText(chatId, 'promptpay'), callback_data: 'thb_promptpay' }],
+            [{ text: getText(chatId, 'bank_transfer'), callback_data: 'thb_bank' }],
+            [{ text: getText(chatId, 'back'), callback_data: 'back_to_amount_thb' }],
+            [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
+          ]
+        }
       });
     } else if (data === 'thb_bank') {
-      state.paymentType = 'Bank Transfer';
-      state.step = 'await_proof';
-
-      await bot.editMessageText(`🏦 ${getText(chatId, 'bank_transfer')} ${getText(chatId, 'payment_details')}\n\n💰 Amount: ${state.thb} THB\n💲 USD: $${state.usd}\n\n📱 Please send to:\n🏷️ Name: EdenVault SMM\n🏦 Bank: Kasikorn Bank\n🔢 Account: 123-4-56789-0\n\n${getText(chatId, 'upload_proof')}`, {
+      await bot.editMessageText(`🏦 ${getText(chatId, 'bank_transfer')} ${getText(chatId, 'payment_details')}\n\n⚠️ Currently Unavailable\n\nThis payment method is temporarily unavailable. Please choose another payment option.\n\n${getText(chatId, 'choose_thb_payment')}`, {
         chat_id: chatId,
         message_id: msgId,
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: getText(chatId, 'promptpay'), callback_data: 'thb_promptpay' }],
+            [{ text: getText(chatId, 'bank_transfer'), callback_data: 'thb_bank' }],
+            [{ text: getText(chatId, 'back'), callback_data: 'back_to_amount_thb' }],
+            [{ text: '📋 Menu', callback_data: 'back_to_menu' }]
+          ]
+        }
       });
     } else if (data === 'back_to_amount_thb') {
       state.step = 'enter_amount';
