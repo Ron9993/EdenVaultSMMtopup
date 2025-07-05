@@ -15,8 +15,8 @@ if (!process.env.ADMIN_ID) {
 
 const bot = new TelegramBot(process.env.BOT_TOKEN, { polling: true });
 const ADMIN_ID = process.env.ADMIN_ID;
-const USD_RATE = 4510; // MMK per USD
-const THB_RATE = 36; // THB per USD
+const USD_RATE = 4490; // MMK per USD
+const THB_RATE = 33; // THB per USD
 
 let userStates = {}; // To track each user's flow
 
